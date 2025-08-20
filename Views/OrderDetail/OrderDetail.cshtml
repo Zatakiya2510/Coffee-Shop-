@@ -1,0 +1,107 @@
+﻿@model DataTable
+@using System.Data
+
+<main id="main" class="main">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">OrderDetail Details</h5>
+                <button class="btn btn-primary">
+                    <a class="text-white" asp-controller="OrderDetail" asp-action="OrderDetailForm">
+                        <i class="bi bi-plus"></i><span>Add OrderDetail</span>
+                    </a>
+                </button>
+                <button class="btn btn-success ms-2">
+                    <a class="text-white" asp-controller="OrderDetail" asp-action="ExportToExcel">
+                        <i class="bi bi-file-earmark-excel"></i><span>Export to Excel</span>
+                    </a>
+                </button>
+            </div>
+
+            <h6 class="text-danger">@TempData["ErrorMessage"]</h6>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">OrderDetailID</th>
+                        <th scope="col">OrderID</th>
+                        <th scope="col">ProductID</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">TotalAmount</th>
+                        <th scope="col">UserID</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow dataRow in Model.Rows)
+                    {
+                        <tr>
+                            <th scope="row">@dataRow["OrderDetailID"]</th>
+                            <td>@dataRow["OrderCode"]</td>
+                            <td>@dataRow["ProductName"]</td>
+                            <td>@dataRow["Quantity"]</td>
+                            <td>@dataRow["Amount"]</td>
+                            <td>@dataRow["TotalAmount"]</td>
+                            <td>@dataRow["UserName"]</td>
+                            <td>
+                                <div class="d-flex align-items-stretch">
+                                    <!-- Delete button -->
+                                    <button class="btn" onclick="confirmDelete('@dataRow["OrderDetailID"]')">
+                                        <i class="fas fa-trash-alt" style="color: red;"></i>
+                                    </button>
+                                    <!-- Edit button -->
+                                    <a asp-controller="OrderDetail" asp-action="OrderDetailForm" asp-route-OrderDetailID="@dataRow["OrderDetailID"]" title="Edit">
+                                        <button class="btn">
+                                            <i class="fas fa-edit" style="color: greenyellow;"></i>
+                                        </button>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    function confirmDelete(orderDetailID) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Perform AJAX POST request to delete the order detail
+                $.ajax({
+                    url: '/OrderDetail/OrderDetailDelete',
+                    type: 'POST',
+                    data: { OrderDetailID: orderDetailID },
+                    success: function () {
+                        Swal.fire(
+                            'Deleted!',
+                            'The order detail has been deleted.',
+                            'success'
+                        ).then(() => {
+                            location.reload(); // Reload the page after success
+                        });
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'There was a problem deleting the order detail.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
+</script>
+

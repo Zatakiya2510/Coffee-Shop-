@@ -1,0 +1,105 @@
+﻿@model DataTable
+@using System.Data;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<main id="main" class="main">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">Product Detail</h5>
+                <button class="btn btn-primary">
+                    <a class="text-white" asp-controller="Product" asp-action="ProductForm">
+                        <i class="bi bi-plus"></i><span>Add Product</span>
+                    </a>
+                </button>
+                <button class="btn btn-success ms-2">
+                    <a class="text-white" asp-controller="Product" asp-action="ExportToExcel">
+                        <i class="bi bi-file-earmark-excel"></i><span>Export to Excel</span>
+                    </a>
+                </button>
+            </div>
+
+            <h6 class="text-danger">@TempData["ErrorMessage"]</h6>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">ProductID</th>
+                        <th scope="col">ProductName</th>
+                        <th scope="col">ProductCode</th>
+                        <th scope="col">ProductPrice</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">UserID</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (DataRow dataRow in Model.Rows)
+                    {
+                        <tr>
+                            <th scope="row">@dataRow["ProductID"]</th>
+                            <td>@dataRow["ProductName"]</td>
+                            <td>@dataRow["ProductCode"]</td>
+                            <td>@dataRow["ProductPrice"]</td>
+                            <td>@dataRow["Description"]</td>
+                            <td>@dataRow["UserName"]</td>
+                            <td>
+                                <div class="d-flex align-items-stretch">
+                                    <button class="btn" onclick="confirmDelete(@dataRow["ProductID"])">
+                                        <i class="fas fa-trash-alt" style="color: red;"></i>
+                                    </button>
+                                    <!-- Edit button -->
+                                    <a asp-controller="Product" asp-action="ProductForm" asp-route-ProductID="@dataRow["ProductID"]" title="Edit">
+                                        <button class="btn">
+                                            <i class="fas fa-edit" style="color: greenyellow;"></i>
+                                        </button>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<script>
+    function confirmDelete(productId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Submit form if confirmed
+                $.ajax({
+                    url: '/Product/ProductDelete',
+                    type: 'POST',
+                    data: { ProductID: productId },
+                    success: function () {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your product has been deleted.',
+                            'success'
+                        ).then(() => {
+                            location.reload(); // Reload the page to reflect changes
+                        });
+                    },
+                    error: function () {
+                        Swal.fire(
+                            'Error!',
+                            'There was a problem deleting the product.',
+                            'error'
+                        );
+                    }
+                });
+            }
+        });
+    }
+</script>
