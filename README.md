@@ -70,7 +70,7 @@ SQL Server
 Visual Studio 2022 / VS Code
 
 2️⃣ Clone the Repository
-git clone https://github.com/yourusername/CoffeeShopManagement.git
+git clone [https://github.com/Zatakiya2510/Coffee-Shop-]
 cd CoffeeShopManagement
 
 3️⃣ Database Setup
